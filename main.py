@@ -1,9 +1,7 @@
-from tinydb import TinyDB, Query
 import networkx as nx
 import matplotlib.pyplot as plt
 
 G = nx.Graph()
-dbResultAction = TinyDB('db/resultAction.json')
 graf = [
     {
         'i': 1,
@@ -37,6 +35,8 @@ graf = [
     }
 ]
 costs = {}
+costsMax = {
+}
 nc = {}
 processed = []
 parents = {}
@@ -89,18 +89,28 @@ def base_costs():
         costs[n] = next(i for i in graf if i['j'] == n)['t']
 
 
-def get_lower_cost():
+def get_lower_cost(costs_current):
     lower_cost = float('inf')
     lower_node = None
     for c in costs:
-        if costs[c] < lower_cost and c not in processed:
-            lower_cost = costs[c]
+        if costs_current[c] < lower_cost and c not in processed:
+            lower_cost = costs_current[c]
+            lower_node = c
+    return lower_node
+
+
+def get_max_cost(costs_current):
+    lower_cost = 0
+    lower_node = None
+    for c in costs:
+        if costs_current[c] > lower_cost and c not in processed:
+            lower_cost = costs_current[c]
             lower_node = c
     return lower_node
 
 
 def get_min_way():
-    node = get_lower_cost()
+    node = get_lower_cost(costs)
     while node is not None:
         cost = costs[node]
         neighbors = nc[node]
@@ -110,7 +120,15 @@ def get_min_way():
                 costs[n] = new_cost
                 parents[n] = node
         processed.append(node)
-        node = get_lower_cost()
+        node = get_lower_cost(costs)
+
+
+def get_max_way(node):
+    cost = costsMax.get(node['i'], 0) + node['t']
+    if cost > costsMax.get(node['j'], 0):
+        costsMax[node['j']] = cost
+    for g in [i for i in graf if i['i'] == node['j']]:
+        get_max_way(g)
 
 
 def main():
@@ -119,9 +137,13 @@ def main():
     set_nc()
     base_costs()
     get_min_way()
-    print(costs)
-    print(parents)
-    print(nc)
+    get_max_way({'i': 0, 'j': 1, 't': 0})
+    # print(costs)
+    value = list(costsMax.items())
+    value.sort(key=lambda x: x[0], reverse=False)
+    print(value)
+    # print(parents)
+    # print(nc)
 
 
 if __name__ == "__main__":
