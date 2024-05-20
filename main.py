@@ -131,19 +131,22 @@ def get_max_way(node):
         get_max_way(g)
 
 
+def show_data():
+    value = list(costsMax.items())
+    value.sort(key=lambda x: x[0], reverse=False)
+    print('max way', value)
+    print('parents', parents)
+    print('edges', nc)
+    create_graf()
+
+
 def main():
-    # create_graf()
     base_prepare()
     set_nc()
     base_costs()
     get_min_way()
     get_max_way({'i': 0, 'j': 1, 't': 0})
-    # print(costs)
-    value = list(costsMax.items())
-    value.sort(key=lambda x: x[0], reverse=False)
-    print(value)
-    # print(parents)
-    # print(nc)
+    show_data()
 
 
 if __name__ == "__main__":
