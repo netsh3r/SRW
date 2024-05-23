@@ -6,6 +6,9 @@ class GrafTable:
         self.PN: int = 0
         self.PO: int = 0
         self.RP: int = 0
+        self.RRN: int = 0
+        self.RS: int = 0
+        self.KN: int = 0
 
 
 class GrafModel:
@@ -27,10 +30,16 @@ class GrafModel:
         print(self.__graf_nodes)
         print(self.__desc_graf_nodes)
         for i in [
-            "{0}: T: {3} | RN: {1} | RO: {2} | PN: {4}| PO: {5}| RP: {6}".format(i, self.Graf[i].RN, self.Graf[i].RO,
-                                                                                 self.Graf[i].T, self.Graf[i].PN,
-                                                                                 self.Graf[i].PO,
-                                                                                 self.Graf[i].RP) for i in self.Graf]:
+            "{0}: T: {3} | RN: {1} | RO: {2} | PN: {4}| PO: {5}| RP: {6} | RRN: {7} | RS: {8}".format(i,
+                                                                                                      self.Graf[i].RN,
+                                                                                                      self.Graf[i].RO,
+                                                                                                      self.Graf[i].T,
+                                                                                                      self.Graf[i].PN,
+                                                                                                      self.Graf[i].PO,
+                                                                                                      self.Graf[i].RP,
+                                                                                                      self.Graf[i].RRN,
+                                                                                                      self.Graf[i].RS)
+            for i in self.Graf]:
             print(i)
         print("MAX: ", self.__max_val, " ", self.__max_obj)
         self.__max_way = sorted(self.__max_way)
@@ -94,7 +103,11 @@ class GrafModel:
                 # Вычислить начало работы
                 gr.PN = gr.PO - gr.T
                 # Вычислить резерв времени
-                gr.RP = gr.PN - gr.RN
+                gr.RP = gr.PO - gr.RN - gr.T
+                # Выичилсить независимый резерв времени
+                gr.RRN = gr.RP - (gr.PN - gr.RN) - (gr.PO - gr.RO)
+                # Вычислить частичный резерв времени
+                gr.RS = gr.RP - (gr.PO - gr.RO)
 
     # Поиск критического пути. На вход получаем верхнюю обработанную ноду и список
     def __get_max_way(self, node: tuple[int, int], res: list[int]):  # (9,11), 30
@@ -111,7 +124,7 @@ class GrafModel:
                 m = self.Graf[(n, node[0])].RO
                 mn = (n, node[0])
         # Если дошли до ноды начала (1), то добавляем завершающую ноду и ноду начала и выходим из Рекурсии
-        if mn[0] is 1:
+        if mn[0] == 1:
             res.append(mn[1])
             res.append(1)
             self.__max_way = res
