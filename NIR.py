@@ -15,6 +15,14 @@ graf = {
     (9, 11): GrafTable(5),
     (10, 11): GrafTable(4)
 }
+# graf = {
+#     (1, 2): GrafTable(9),
+#     (1, 3): GrafTable(5),
+#     (1, 4): GrafTable(8),
+#     (2, 5): GrafTable(4),
+#     (3, 4): GrafTable(12),
+#     (4, 5): GrafTable(3),
+# }
 
 
 def main():

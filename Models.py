@@ -13,6 +13,8 @@ class GrafModel:
     __max_obj: tuple[int, int] = None
     __graf_nodes: dict[int, list[int]] = {}
     __desc_graf_nodes: dict[int, list[int]] = {}
+    __cost_max: dict[int] = {}
+    __max_way: list[int] = None
 
     def __init__(self, graf: dict[tuple[int, int], GrafTable]):
         self.Graf: dict[tuple[int, int], GrafTable] = graf
@@ -20,6 +22,7 @@ class GrafModel:
     def do_calculate(self):
         self.__prepare_data()
         self.__calculate()
+        self.__get_max_way(self.__max_obj, [])
         print(self.__graf_nodes)
         print(self.__desc_graf_nodes)
         for i in [
@@ -29,6 +32,8 @@ class GrafModel:
                                                                                  self.Graf[i].RP) for i in self.Graf]:
             print(i)
         print("MAX: ", self.__max_val, " ", self.__max_obj)
+        self.__max_way = sorted(self.__max_way)
+        print("Max way: ", " -> ".join(map(str, self.__max_way)))
 
     def __prepare_data(self):
         for g in self.Graf.keys():
@@ -71,3 +76,19 @@ class GrafModel:
                     gr.PO = self.__get_min_pn(j)
                 gr.PN = gr.PO - gr.T
                 gr.RP = gr.PN - gr.RN
+
+    def __get_max_way(self, node: tuple[int, int], res: list[int]):  # (9,11), 30
+        m = 0
+        mn = None
+        res.append(node[1])
+        for n in self.__desc_graf_nodes[node[0]]:
+            if self.Graf[(n, node[0])].RO > m:
+                m = self.Graf[(n, node[0])].RO
+                mn = (n, node[0])
+        if mn[0] is 1:
+            res.append(mn[1])
+            res.append(1)
+            self.__max_way = res
+            return
+        else:
+            self.__get_max_way(mn, res)
